@@ -7,3 +7,6 @@ class MenuItem(models.Model):
     title = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=5,decimal_places=2)
     inventory = models.SmallIntegerField()
+    def __str__(self) -> str:
+        title = self.title
+        return title
