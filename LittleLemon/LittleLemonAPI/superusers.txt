@@ -1,3 +1,9 @@
+SUPERUSER
 DistrictManager
 dm@ll.com
 dm@123
+
+Staff
+GeneralManager
+gm@ll.com
+8np34qHzvP@4pAa
