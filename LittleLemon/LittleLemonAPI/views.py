@@ -19,6 +19,9 @@ class SingleMenuItemView(generics.RetrieveUpdateDestroyAPIView):
 class ListViewCategories(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ['title']
+    search_fields = ['title']
     
 class SingleCategoryView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
