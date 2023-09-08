@@ -2,14 +2,18 @@ from django.shortcuts import render
 from .models import MenuItem, Category
 from .serializers import MenuItemSerializer, CategorySerializer
 from rest_framework import generics, filters, pagination
-from .paginations import MenuItemsSetPagination
+#from .paginations import MenuItemsSetPagination
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
+
 
 # Create your views here.
 
 class ListViewMenuItem(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
-    pagination_class = MenuItemsSetPagination
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     ordering_fields = ['price','inventory']
     search_fields = ['title', 'price', 'inventory']
@@ -28,3 +32,11 @@ class ListViewCategories(generics.ListCreateAPIView):
 class SingleCategoryView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    
+    
+@api_view()
+@permission_classes([IsAuthenticated])
+def secret(request):
+    return Response({'message':"some secret messeage"})
+    
+    

@@ -2,8 +2,10 @@ SUPERUSER
 DistrictManager
 dm@ll.com
 dm@123
+"token": "62e511f86cc6a3f745e19c4c0662f58448d3204c"
 
 Staff
 GeneralManager
 gm@ll.com
 8np34qHzvP@4pAa
+Token: 67c663d1beb189496295a0558ee18617bf51f647
