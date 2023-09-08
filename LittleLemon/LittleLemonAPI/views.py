@@ -14,7 +14,7 @@ from .permissions import AdminOrReadOnly
 
 # Create your views here.
 class ListViewMenuItem(generics.ListCreateAPIView):
-    queryset = MenuItem.objects.all()
+    queryset = MenuItem.objects.all().order_by('-featured')
     serializer_class = MenuItemSerializer
     permission_classes = [AdminOrReadOnly]
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
