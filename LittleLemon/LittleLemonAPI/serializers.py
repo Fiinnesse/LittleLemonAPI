@@ -17,4 +17,9 @@ class MenuItemSerializer(serializers.ModelSerializer):
         extra_kwargs = {'price':{'min_value':1},
                         'inventory':{'min_value':0}}
         
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = User
+        fields = ['username', 'email']
+        
         
