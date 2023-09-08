@@ -1,5 +1,6 @@
 from django.urls import path, include
 from . import views
+from rest_framework.permissions import IsAdminUser
 
 urlpatterns = [
     path('menu-items', views.ListViewMenuItem.as_view()),
@@ -9,4 +10,5 @@ urlpatterns = [
     path('secret', views.secret),
     path('', include('djoser.urls')),
     path('', include('djoser.urls.authtoken')),
+    path('groups/manager/users', views.managers),
 ]

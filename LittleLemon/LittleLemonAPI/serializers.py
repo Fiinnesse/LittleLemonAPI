@@ -1,5 +1,6 @@
 from .models import MenuItem, Category
 from rest_framework import serializers
+from django.contrib.auth.models import User, Group
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta():
@@ -15,4 +16,5 @@ class MenuItemSerializer(serializers.ModelSerializer):
         fields = ['id','title','price','inventory']
         extra_kwargs = {'price':{'min_value':1},
                         'inventory':{'min_value':0}}
+        
         
