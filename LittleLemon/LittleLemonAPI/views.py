@@ -4,9 +4,9 @@ from .serializers import MenuItemSerializer, CategorySerializer, UserListSeriali
 from rest_framework import generics, filters, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly
 from django.contrib.auth.models import User, Group
+from .permissions import AdminOrReadOnly
 
 
 
@@ -16,15 +16,16 @@ from django.contrib.auth.models import User, Group
 class ListViewMenuItem(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = [AdminOrReadOnly]
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
-    ordering_fields = ['price','inventory']
-    search_fields = ['title', 'price', 'inventory']
+    ordering_fields = ['price','inventory','category']
+    search_fields = ['title', 'price', 'inventory','category']
     
     
 class SingleMenuItemView(generics.RetrieveUpdateDestroyAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
+    permission_classes = [AdminOrReadOnly]
     
 class ListViewCategories(generics.ListCreateAPIView):
     queryset = Category.objects.all()
