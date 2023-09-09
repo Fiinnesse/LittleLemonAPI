@@ -26,9 +26,12 @@ class ShoppingCart(models.Model):
     quantity = models.SmallIntegerField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     price = models.DecimalField(max_digits=6, decimal_places=2)
-    
+
     class Meta:
         unique_together = ('items', 'user')
+    def __str__(self):
+        return str(self.user)
+    
         
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -42,8 +45,8 @@ class OrderItem(models.Model):
     order = models.ForeignKey(User, on_delete=models.CASCADE)
     items = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.SmallIntegerField()
-    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    #unit_price = models.DecimalField(max_digits=6, decimal_places=2)
+    #price = models.DecimalField(max_digits=6, decimal_places=2)
     
     class Meta:
         unique_together = ('order', 'items')

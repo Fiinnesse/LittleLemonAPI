@@ -1,4 +1,4 @@
-from .models import MenuItem, Category
+from .models import MenuItem, Category, ShoppingCart, Order, OrderItem
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
 
@@ -25,5 +25,33 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta():
         model = User
         fields = ['username', 'email']
+        
+        
+class CartHelpSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = MenuItem
+        fields = ['id', 'title', 'price']
+        
+class CartSerializer(serializers.ModelSerializer):
+    items = CartHelpSerializer()
+    class Meta():
+        model = ShoppingCart
+        fields = ['items','quantity','price']
+        
+class CartAddSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = ShoppingCart
+        fields = ['items', 'quantity']
+        extra_kwargs = {
+            'quantity': {'min_value': 1},
+        }   
+        
+class CartRemoveSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = ShoppingCart
+        fields = ['items']
+             
+
+    
         
         
