@@ -9,12 +9,6 @@ You can use Djoser in your project to automatically create the following endpoin
 
 Endpoint
 
-Role
-
-Method
-
-Purpose
-
 /api/users
 
 No role required
@@ -26,7 +20,6 @@ Creates a new user with name, email and password
 /api/users/users/me/
 
  
-
 Anyone with a valid user token
 
 GET
@@ -90,13 +83,6 @@ POST, PUT, PATCH, DELETE
 
 Returns 403 - Unauthorized
 
- 
-
- 
-
- 
-
- 
 
 /api/menu-items
 
