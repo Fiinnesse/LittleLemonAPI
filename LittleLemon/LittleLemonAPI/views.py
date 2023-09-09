@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
-from .models import MenuItem, Category, ShoppingCart
+from .models import MenuItem, Category, ShoppingCart, Order, OrderItem
 from .serializers import MenuItemSerializer, CategorySerializer, UserListSerializer, CartSerializer, CartHelpSerializer
-from .serializers import CartAddSerializer, CartRemoveSerializer
+from .serializers import CartAddSerializer, CartRemoveSerializer, OrderSerializer, OrderDeliveryCrew, SingleOrderSerializer
 from rest_framework import generics, filters, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -9,6 +9,8 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthentic
 from django.contrib.auth.models import User, Group
 from .permissions import AdminOrReadOnly
 from django.core.exceptions import ValidationError
+import math
+from datetime import date
 
 
 
@@ -131,6 +133,80 @@ class CartView(generics.ListCreateAPIView):
         else:
             ShoppingCart.objects.filter(user=request.user).delete()
             return Response({'message':'All items have been removed from your cart!'})
+
+class OrderView(generics.ListCreateAPIView):
+    serializer_class = OrderSerializer
+    
+    def get_queryset(self, *args, **kwargs):
+        if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser == True:
+            query = Order.objects.all()
+        elif self.request.user.groups.filter(name='DeliveryCrew').exists():
+            query = Order.objects.filter(delivery_crew=self.request.user)
+        else:
+            query = Order.objects.filter(user=self.request.user)
+        return query
+    
+    def get_permissions(self):
+        if self.request.method == 'GET' or 'POST':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, IsAdminUser]
+        return [permission() for permission in permission_classes]
+    
+    def post(self, request, *args, **kwargs):
+        cart = ShoppingCart.objects.filter(user=request.user)
+        x=cart.values_list()
+        if len(x) == 0:
+            return Response({'message': 'Bad Response'}, status.HTTP_400_BAD_REQUEST)
+        total = math.fsum([float(x[-1]) for x in x])
+        order = Order.objects.create(user=request.user, status=False, total=total, date=date.today())
+        for i in cart.values():
+            items = get_object_or_404(MenuItem, id=i['items_id'])
+            orderitem = Order.objects.create(order=order, items=items, quantity=i['quantity'])
+            orderitem.save()
+        cart.delete()
+        return Response({'message':'Your order has been placed! Your order number is {}'.format(str(order.id))}, status.HTTP_201_CREATED)
+
+class SingleOrderView(generics.ListCreateAPIView):
+    serializer_class = SingleOrderSerializer()
+    
+    def get_permissions(self):
+        order = Order.objects.get(pk=self.kwargs['pk'])
+        if self.request.user == order.user and self.request.method == 'GET':
+            permission_classes = [IsAuthenticated]
+        elif self.request.method == 'PUT' or self.request.method == 'DELETE':
+            permission_classes = [IsAuthenticated, IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticated, IsAdminUser]
+        return[permission() for permission in permission_classes] 
+
+    def get_queryset(self, *args, **kwargs):
+            query = OrderItem.objects.filter(order_id=self.kwargs['pk'])
+            return query
+
+
+    def patch(self, request, *args, **kwargs):
+        order = Order.objects.get(pk=self.kwargs['pk'])
+        order.status = not order.status
+        order.save()
+        return Response({'message':'Status of order #'+ str(order.id)+' changed to '+str(order.status)}, status.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        serialized_item = OrderDeliveryCrew(data=request.data)
+        serialized_item.is_valid(raise_exception=True)
+        order_pk = self.kwargs['pk']
+        crew_pk = request.data['delivery_crew'] 
+        order = get_object_or_404(Order, pk=order_pk)
+        crew = get_object_or_404(User, pk=crew_pk)
+        order.delivery_crew = crew
+        order.save()
+        return Response({'message':str(crew.username)+' was assigned to order #'+str(order.id)}, status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        order = Order.objects.get(pk=self.kwargs['pk'])
+        order_number = str(order.id)
+        order.delete()
+        return Response({'message':'Order #{} was deleted'.format(order_number)}, status.HTTP_200_OK)  
     
         
     

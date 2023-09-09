@@ -50,7 +50,22 @@ class CartRemoveSerializer(serializers.ModelSerializer):
     class Meta():
         model = ShoppingCart
         fields = ['items']
-             
+ 
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = Order    
+        fields = ['id', 'user', 'total', 'status', 'delivery_crew', 'date']
+        
+class SingleOrderSerializer(serializers.ModelSerializer):
+    menuitem = CartHelpSerializer()
+    class Meta():
+        mdoel = OrderItem
+        fields = ['menuitem','quantity']
+        
+class OrderDeliveryCrew(serializers.ModelSerializer):
+    class Meta():
+        model = Order
+        fields = ['delivery_crew']        
 
     
         
